@@ -5,9 +5,19 @@ setting.size = {width:24, height:24};
 setting.costFunction = function(v,c){
 	var i = c.i-11;
 	var j = 11-c.j;
-	return Math.abs(i*2)*j
+	return i*j % Math.abs(i+j)
 }
 
+setting.walls = []
+
+// Generate wall
+var wi=10, wj = 0;
+while (wi<23 && wj<23){
+	setting.walls.push({i:wi,j:wj})
+	setting.walls.push({i:wi+1,j:wj});
+	wi += 1;
+	wj += 2;
+}
 
 var grid = spatial.generate(setting);
 
