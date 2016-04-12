@@ -1,0 +1,29 @@
+{
+  "name": "spatialjs",
+  "description": "Lightweight JavaScript library for 2D spatial grid computation, illustration, and analysis",
+  "author": "StarColon Projects",
+  "email": "tao@starcolon.com",
+  "url": "http://starcolon.com/",
+  "main": "spatial.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/starcolon/spatialjs.git"
+  },
+  "version": "0.0.1",
+  "private": false,
+  "scripts": {
+    "test": "mocha test"
+  },
+  "dependencies": {
+    "body-parser": ">= 1.10.0",
+    "chai": "^2.3.0",
+    "chai-things": "^0.2.0",
+    "colors": "*",
+    "express": "*",
+    "mocha": "*",
+    "mongodb": "^1.4.28",
+    "mongoskin": "^1.4.13",
+    "underscore": "*",
+    "promise": "*"
+  }
+}
