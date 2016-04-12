@@ -166,7 +166,7 @@ below.illustrate = function(grid, route){
 			else if (cell['cost']>=0xFFFF)
 				block = '☒ '.red;
 			else if (isPartOfRoute({i:parseInt(i),j:parseInt(j)}))
-				block = '★ '.green;
+				block = '★ '.white.bgGreen;
 			else
 				block = applyColorByCost(cell['cost'])
 
