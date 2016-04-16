@@ -1,9 +1,6 @@
 /** 
- * [below.js]
- * A library for implementing below-surface grid simulation
- * implemented by
- * @TaoPR (StarColon Projects)
- * 2015
+ * [spatial.js]
+ * The processor of spatial data
  */
 
 "use strict";
@@ -15,16 +12,16 @@ if (typeof(Grid)=='undefined') var Grid = require('./modules/grid.js').Grid;
 
 
 // Module definitions
-var below = {}
+var spatial = {}
 
 /**
  * Settings namespace
  */
-below.settings = {
+spatial.settings = {
 	/**
-	 * below.settings.create()
-	 * Create an empty @below settings
-	 * @returns {below.settings} object
+	 * spatial.settings.create()
+	 * Create an empty @spatial settings
+	 * @returns {spatial.settings} object
 	 */
 	create: function(){
 		return {
@@ -42,10 +39,10 @@ below.settings = {
 
 /**
  * Generates a new grid given the configurations
- * @param {below.settings} settings 
+ * @param {spatial.settings} settings 
  * @returns {Grid} output grid generated with the given configurations
  */
-below.generate = function(settings){
+spatial.generate = function(settings){
 	if (settings.size.width*settings.size.height<=0)
 		throw 'The size must be properly defined';
 
@@ -87,7 +84,7 @@ below.generate = function(settings){
  * @param {grid}
  * @returns {Array} of coordinates representing the entrances
  */
-below.entrances = function(grid){
+spatial.entrances = function(grid){
 	var entrances = [];
 	for (var i in grid)
 		for (var j in grid[i]){
@@ -102,7 +99,7 @@ below.entrances = function(grid){
  * @param {grid}
  * @returns {Array} of coordinates representing the exits
  */
-below.exits = function(grid){
+spatial.exits = function(grid){
 	var exits = [];
 	for (var i in grid)
 		for (var j in grid[i]){
@@ -118,7 +115,7 @@ below.exits = function(grid){
  * @param {Coord} coord
  * @returns {Bool}
  */
-below.isDug = function(cellvalue,coord){
+spatial.isDug = function(cellvalue,coord){
 	return (cellvalue['cost'] || 1) <= 1
 }
 
@@ -127,7 +124,7 @@ below.isDug = function(cellvalue,coord){
  * @param {grid}
  * @param {Array} route - Array of the coordinates representing 
  */
-below.illustrate = function(grid, route){
+spatial.illustrate = function(grid, route){
 	let lines = [];
 	route = route || [];
 	function isPartOfRoute(coord){
@@ -180,7 +177,7 @@ below.illustrate = function(grid, route){
 		console.log(lines[l])
 }
 
-below.illustrateCost = function(grid,route){
+spatial.illustrateCost = function(grid,route){
 	let lines = [];
 	route = route || [];
 	function isPartOfRoute(coord){
@@ -231,10 +228,10 @@ below.illustrateCost = function(grid,route){
  * @param {bool} verbose
  * @returns {Array} array of coordinates representing the route
  */
-below.generateSimpleRoute = function(grid,startCoord,endCoord,verbose){
+spatial.generateSimpleRoute = function(grid,startCoord,endCoord,verbose){
 	// Rewrite the parameters if any of them is omitted
-	startCoord = startCoord || _.first(below.entrances(grid));
-	endCoord = endCoord || _.first(below.exits(grid));
+	startCoord = startCoord || _.first(spatial.entrances(grid));
+	endCoord = endCoord || _.first(spatial.exits(grid));
 
 	var isNotWall = function(value,coord){ return value['cost']!=0xFFFF }
 	var route = Grid.routeOf(grid)
@@ -255,10 +252,10 @@ below.generateSimpleRoute = function(grid,startCoord,endCoord,verbose){
  * @param {verbose} verbose
  * @returns {Array} array of coordinates representing the route
  */
-below.generateBestRoute = function(grid,startCoord,endCoord,verbose){
+spatial.generateBestRoute = function(grid,startCoord,endCoord,verbose){
 	// Rewrite the parameters if any of them is omitted
-	startCoord = startCoord || _.first(below.entrances(grid));
-	endCoord = endCoord || _.first(below.exits(grid));
+	startCoord = startCoord || _.first(spatial.entrances(grid));
+	endCoord = endCoord || _.first(spatial.exits(grid));
 
 	var cost = function(value,coord){ return value['cost'] || 0 }
 	var isNotWall = function(value,coord){ return value['cost']>=0xFFFF }
@@ -279,7 +276,7 @@ below.generateBestRoute = function(grid,startCoord,endCoord,verbose){
  * @param {Array} array of cell coordinates 
  * @returns {Float} total cost
  */
-below.sumCostOfRoute = function(grid,route){
+spatial.sumCostOfRoute = function(grid,route){
 	var costVector = route.map(function (coord){
 		return grid[parseInt(coord.i)][parseInt(coord.j)].cost || 0
 	});
@@ -294,7 +291,7 @@ below.sumCostOfRoute = function(grid,route){
  * @param {Coordinate} from
  * @returns {Array} list of cells painted by floodfill
  */
-below.floodfill = function(grid,from){
+spatial.floodfill = function(grid,from){
 	let here = from;
 	function isAccessible(cell){ return cell['cost'] <= 1 }
 	return Grid.floodfill(grid).from(here.i,here.j).where(isAccessible).commit();
@@ -306,8 +303,8 @@ below.floodfill = function(grid,from){
  * @param {Coord}
  * @returns {Bool}
  */
-below.isAccessible = function(grid,from,to){
-	let accessibleFromHere = below.floodfill(grid,from);
+spatial.isAccessible = function(grid,from,to){
+	let accessibleFromHere = spatial.floodfill(grid,from);
 	return _.any(accessibleFromHere, function(c){ return c.i==to.i && c.j==to.j })
 }
 
@@ -316,8 +313,8 @@ below.isAccessible = function(grid,from,to){
  * @param {Grid}
  * @returns {Bool}
  */
-below.isExitAccessible = function(grid,from){
-	let accessibleFromHere = below.floodfill(grid,from);
+spatial.isExitAccessible = function(grid,from){
+	let accessibleFromHere = spatial.floodfill(grid,from);
 	return _.any(accessibleFromHere, function(c){ return grid[c.i][c.j]['isExit'] === true } )
 }
 
@@ -325,10 +322,10 @@ below.isExitAccessible = function(grid,from){
 /**
  * MongoDB connectivity
  */
-below.mongo = {
+spatial.mongo = {
 
 	// DESIGN NOTE: 
-	// 	All functions of {below.mongdo} return Promises.
+	// 	All functions of {spatial.mongdo} return Promises.
 	//	This is specifically a design pattern for asynchronous use.
 
 
@@ -521,10 +518,10 @@ below.mongo = {
 /**
  * 2D array utility functions
  */
-below.array2d = {
+spatial.array2d = {
 
 	/**
-	 * below.array2d.size(grid)
+	 * spatial.array2d.size(grid)
 	 * Get the size (width x height) of the given grid
 	 * @param {Grid}
 	 * @returns {Array}, the first element is width, the second is height
@@ -536,7 +533,7 @@ below.array2d = {
 	},
 
 	/**
-	 * below.array2d.map(grid,mapper)
+	 * spatial.array2d.map(grid,mapper)
 	 * Map a grid to another grid using mapper function
 	 * @param {Grid}
 	 * @param {Function} F - mapper function which takes a value of a cell and returns the output value
@@ -554,7 +551,7 @@ below.array2d = {
 	},
 
 	/**
-	 * below.array2d.offset(grid,1000,1000)
+	 * spatial.array2d.offset(grid,1000,1000)
 	 * Shift a grid by offset
 	 * @param {Grid}
 	 * @param {number} offset i (column) to shift the grid
@@ -578,7 +575,7 @@ below.array2d = {
 
 	/* Synnonym function for `offset`
 	 */
-	shift: function(grid,offset_i,offset_j){ below.array2d.offset(grid,offset_i,offset_j) },
+	shift: function(grid,offset_i,offset_j){ spatial.array2d.offset(grid,offset_i,offset_j) },
 
 	/**
 	 * Merge multiple grids together
@@ -606,7 +603,7 @@ below.array2d = {
 
 
 	/**
-	 * below.array2d.pluck(grid,'cost')
+	 * spatial.array2d.pluck(grid,'cost')
 	 * Works similarly to underscor's pluck function on each cell
 	 * @param {Grid}
 	 * @param {String} prop - The property to pluck
@@ -621,11 +618,11 @@ below.array2d = {
 }
 
 /**
- * UI sub-library for below rendering and UI stuffs
+ * UI sub-library for spatial rendering and UI stuffs
  */
-below.ui = {
+spatial.ui = {
 	/**
-	 * below.ui.render(grid, container)
+	 * spatial.ui.render(grid, container)
 	 * Renders a grid in the container object (DOM)
 	 * @param {Grid}
 	 * @param {DOM}
@@ -708,6 +705,6 @@ below.ui = {
 
 
 if (typeof(module)!='undefined'){
-	module.exports = below;
+	module.exports = spatial;
 }
 

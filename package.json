@@ -23,7 +23,8 @@
     "mocha": "*",
     "mongodb": "^1.4.28",
     "mongoskin": "^1.4.13",
-    "underscore": "*",
-    "promise": "*"
+    "priorityqueuejs": "^1.0.0",
+    "promise": "*",
+    "underscore": "*"
   }
 }
