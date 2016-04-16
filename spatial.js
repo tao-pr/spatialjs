@@ -325,6 +325,18 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 			}
 		})
 	}
+
+	// Once the q is empty, the complete route is now 
+	// supposed to be constructed
+	var route = [endCoord];
+	while (true){
+		var tail = _.last(route);
+		if (tail.i == startCoord.i && tail.j == startCoord.j)
+			break;
+		var next = Grid.cell(tail.i,tail.j).of(prev);
+		route.push(next);
+	}
+	return route.reverse();
 }
 
 
