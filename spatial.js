@@ -269,6 +269,64 @@ spatial.generateBestRoute = function(grid,startCoord,endCoord,verbose){
 	return route;
 }
 
+/**
+ * Generate the shortest route (of which total cost is minimal)
+ * using Dijkstra algorithm
+ */
+spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
+
+	var HeapQ = require('priorityqueuejs');
+
+	var dist = Grid.duplicateStructure(grid,undefined);
+	var prev = Grid.duplicateStructure(grid,undefined);
+
+	// Create vertex set 
+	var q = new HeapQ((a,b) => a.dist - b.dist)
+	var iterator = Grid.eachCell(grid);
+
+	iterator((c,i,j) => {
+		// Initialise the distance from the source
+		// to each of the cell on the grid
+		var dist = Infinity;
+		if (i==startCoord.i && j==startCoord.j){
+			dist = 0;
+		}
+		else{
+			Grid.cell(i,j).set(prev)(undefined);
+			Grid.cell(i,j).set(dist)(Infinity);
+		}
+
+		q.enq({i:i, j:j, dist: dist})
+	})
+
+	// Main loop of path construction
+	while (q.size()>0){
+		// At the 1st turn, the start coord is supposed to be chosen
+		var u = q.deq();
+
+		if (verbose){
+			console.log('Next u = '.cyan, u);
+		}
+
+		// Examine all neighbors of @u
+		// TAOTODO:
+		var neighbors = Grid.eachSibling(grid);
+		var dist_u    = Grid.cell(u.i,u.j).of(dist);
+		neighbors(u.i, u.j)((v,_i,_j) => {
+			var actualDist = dist_u + v.cost;
+			if (actualDist < Grid.cell(_i,_j).of(dist)){
+				// Apply the actual examined distance cost of @v
+				Grid.cell(_i,_j).set(dist)(actualDist);
+				// Predecessor of @v now set to @u
+				Grid.cell(_i,_j).set(prev)({i:u.i, j:v.j});
+
+				// Reapply the priority of @v in the heap
+				// TAOTODO: Find a heapQ which has this feature
+			}
+		})
+	}
+}
+
 
 /**
  * Sum the total cost it needs to spend moving through the given route
