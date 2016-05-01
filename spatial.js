@@ -133,7 +133,7 @@ spatial.illustrate = function(grid, route){
 		})
 	}
 
-	// TAOTODO: Highlight cell by cost value
+	// Highlight cell by cost value
 	var minCost = 0xFFFF;
 	var maxCost = -0xFFFF;
 	var gatherCost = function(cell){
@@ -309,7 +309,6 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 		}
 
 		// Examine all neighbors of @u
-		// TAOTODO:
 		var neighbors = Grid.eachSibling(grid);
 		var dist_u    = Grid.cell(u.i,u.j).of(dist);
 		neighbors(u.i, u.j)((v,_i,_j) => {
