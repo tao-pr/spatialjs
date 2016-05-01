@@ -20,6 +20,7 @@
     "chai-things": "^0.2.0",
     "colors": "*",
     "express": "*",
+    "heap": "^0.2.6",
     "mocha": "*",
     "mongodb": "^1.4.28",
     "mongoskin": "^1.4.13",
