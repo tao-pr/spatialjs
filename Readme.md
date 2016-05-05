@@ -4,6 +4,8 @@
 
 A bite-sized tool for 2D spatial grid processing.
 
+---
+
 ## Include SpatialJS to your project
 
 ```javascript
@@ -120,8 +122,21 @@ var grid1 = Grid.create(20,20,'A');
 var grid2 = spatial.array2d.offset(Grid.create(100,100,'B'),21,0);
 var mergedGrid = spatial.array2d.merge(grid1, grid2); 
 ```
+---
 
+# Sample usage
 
+A sample script can be found at [/sample.js](/sample.js) and 
+it includes several combination of the library usage. Hope it helps 
+you out on how to get started quickly.
+
+---
+
+# Licence
+
+![WTFPL](https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/WTFPL_logo.svg/280px-WTFPL_logo.svg.png)
+
+The project is licenced under [WTFPL](http://www.wtfpl.net/). 
 
 
 
