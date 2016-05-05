@@ -276,7 +276,7 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 
 	var HeapQ = require('fastpriorityqueue');
 
-	var dist = Grid.duplicateStructure(grid,undefined);
+	var dist = Grid.duplicateStructure(grid,Infinity);
 	var prev = Grid.duplicateStructure(grid,undefined);
 
 	// Create vertex set 
@@ -284,18 +284,18 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 	var iterator = Grid.eachCell(grid);
 
 	iterator((c,i,j) => {
+
+		if (verbose)
+			console.log(`Adding c=${JSON.stringify(c)} i=${i} j=${j} to queue`)
+
 		// Initialise the distance from the source
 		// to each of the cell on the grid
 		var dist = Infinity;
 		if (i==startCoord.i && j==startCoord.j){
 			dist = 0;
 		}
-		else{
-			Grid.cell(i,j).set(prev)(undefined);
-			Grid.cell(i,j).set(dist)(Infinity);
-		}
 
-		q.add({i:i, j:j, dist: dist})
+		q.add({i:parseInt(i), j:parseInt(j), dist: dist})
 	})
 
 	// Main loop of path construction
@@ -305,19 +305,29 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 
 		if (verbose){
 			console.log('Next u = '.cyan, u);
+			console.log('Q size = '.cyan, q.size);
 		}
 
 		// Examine all neighbors of @u
-		// TAOTODO:
-		var neighbors = Grid.eachSibling(grid);
-		var dist_u    = Grid.cell(u.i,u.j).of(dist);
-		neighbors(u.i, u.j)((v,_i,_j) => {
-			var actualDist = dist_u + v.cost;
+		var eachNeighbors = Grid.eachSibling(grid)(u.i,u.j);
+		var dist_u        = Grid.cell(u.i,u.j).of(dist);
+
+		eachNeighbors((v,_i,_j) => {
+
+			if (verbose)
+				console.log('Expanding: '.yellow + `(${_i},${_j})`)
+
+			var actualDist = dist_u < Infinity ? v.cost + dist_u : v.cost;
 			if (actualDist < Grid.cell(_i,_j).of(dist)){
 				// Apply the actual examined distance cost of @v
 				Grid.cell(_i,_j).set(dist)(actualDist);
 				// Predecessor of @v now set to @u
-				Grid.cell(_i,_j).set(prev)({i:u.i, j:v.j});
+				Grid.cell(_i,_j).set(prev)({i:u.i, j:u.j});
+
+				if (verbose){
+					console.log('New distance.. '.green,
+						`(${_i},${_j}) = ${actualDist}`)
+				}
 
 				// Reapply the priority of @v in the heap
 				var tmpList = [];
@@ -329,7 +339,7 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 					// Update its new (actual) distance
 					var elem  = q.poll();
 					elem.dist = actualDist;
-					q.push(elem);
+					q.add(elem);
 				}
 
 				// Push the polled item back in to the queue
@@ -342,6 +352,12 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 
 	// Once the q is empty, the complete route is now 
 	// supposed to be constructed
+	if (verbose)
+		console.log('Constructing route'.cyan);
+
+	// TAODEBUG:
+	console.log(prev);
+
 	var route = [endCoord];
 	while (true){
 		var tail = _.last(route);
