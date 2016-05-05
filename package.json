@@ -20,11 +20,10 @@
     "chai-things": "^0.2.0",
     "colors": "*",
     "express": "*",
-    "heap": "^0.2.6",
+    "fastpriorityqueue": "0.0.16",
     "mocha": "*",
     "mongodb": "^1.4.28",
     "mongoskin": "^1.4.13",
-    "priorityqueuejs": "^1.0.0",
     "promise": "*",
     "underscore": "*"
   }
