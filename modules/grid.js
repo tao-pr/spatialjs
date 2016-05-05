@@ -219,7 +219,7 @@ Grid.eachSibling = function(grid){
 		return function(F){
 			var siblings = Grid.siblings(grid)(i,j);
 			siblings.forEach(function(coord){
-				var i = coord[0], j = coord[j];
+				var i = coord[0], j = coord[1];
 				var value = Grid.cell(i,j).of(grid);
 				F(value, i, j);
 			});

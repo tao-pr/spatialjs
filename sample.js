@@ -21,12 +21,21 @@ while (wi<23 && wj<23){
 
 var grid = spatial.generate(setting);
 
-
+// A* route
+console.log('--------------'.green)
+console.log('A* route'.green)
+console.log('--------------'.green)
 var route = spatial.generateBestRoute(grid,{i:12,j:0},{i:23,j:23});
 spatial.illustrate(grid, route);
 console.log('Total cost spent for this route: ' + spatial.sumCostOfRoute(grid,route).toFixed(0).toString() );
 
-//function showSummary(n){ console.log( (n + ' records saved to the database').toString().cyan ) }
-//spatial.mongo.init(null,'test','grid').then(spatial.mongo.save(grid)).done(showSummary);
+// Dijkstra route
+console.log('--------------'.green)
+console.log('Dijkstra route'.green)
+console.log('--------------'.green)
+route = spatial.generateDijkstraRoute(grid,{i:12,j:0},{i:23,j:23},true);
+spatial.illustrate(grid, route);
+console.log('Total cost spent for this route: ' + spatial.sumCostOfRoute(grid,route).toFixed(0).toString() );
+
 
 
