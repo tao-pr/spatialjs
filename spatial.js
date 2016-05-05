@@ -133,7 +133,6 @@ spatial.illustrate = function(grid, route){
 		})
 	}
 
-	// Highlight cell by cost value
 	var minCost = 0xFFFF;
 	var maxCost = -0xFFFF;
 	var gatherCost = function(cell){
@@ -275,7 +274,7 @@ spatial.generateBestRoute = function(grid,startCoord,endCoord,verbose){
  */
 spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 
-	var HeapQ = require('priorityqueuejs');
+	var HeapQ = require('fastpriorityqueue');
 
 	var dist = Grid.duplicateStructure(grid,undefined);
 	var prev = Grid.duplicateStructure(grid,undefined);
@@ -296,19 +295,20 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 			Grid.cell(i,j).set(dist)(Infinity);
 		}
 
-		q.enq({i:i, j:j, dist: dist})
+		q.add({i:i, j:j, dist: dist})
 	})
 
 	// Main loop of path construction
-	while (q.size()>0){
+	while (!q.isEmpty()){
 		// At the 1st turn, the start coord is supposed to be chosen
-		var u = q.deq();
+		var u = q.poll();
 
 		if (verbose){
 			console.log('Next u = '.cyan, u);
 		}
 
 		// Examine all neighbors of @u
+		// TAOTODO:
 		var neighbors = Grid.eachSibling(grid);
 		var dist_u    = Grid.cell(u.i,u.j).of(dist);
 		neighbors(u.i, u.j)((v,_i,_j) => {
@@ -320,7 +320,22 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 				Grid.cell(_i,_j).set(prev)({i:u.i, j:v.j});
 
 				// Reapply the priority of @v in the heap
-				// TAOTODO: Find a heapQ which has this feature
+				var tmpList = [];
+				while (q.size>0 && q.peek().i!=u.i && q.peek().j!=u.j)
+					tmpList.push(q.poll())
+				
+				// The item addressed?
+				if (q.size>0){
+					// Update its new (actual) distance
+					var elem  = q.poll();
+					elem.dist = actualDist;
+					q.push(elem);
+				}
+
+				// Push the polled item back in to the queue
+				while (tmpList.length>0){
+					q.add(tmpList.pop())
+				}
 			}
 		})
 	}

@@ -9,15 +9,15 @@ chai.config.includeStack = true;
 
 // Module dependency
 var _ = require('underscore');
-var below = require('../below.js');
+var spatial = require('../spatial.js');
 var Grid = require('../modules/grid.js').Grid;
 
-describe('@below test kit',function(){
+describe('@spatial test kit',function(){
 
 	describe('Creation tests', function(){
 
 		it('should create a settings object', function(){
-			var settings = below.settings.create();
+			var settings = spatial.settings.create();
 
 			expect(settings).to.have.property('size');
 			expect(settings).to.have.property('entrances');
@@ -29,7 +29,7 @@ describe('@below test kit',function(){
 		})
 
 		it('should create a grid which satisfies the settings', function(){
-			var settings = below.settings.create();
+			var settings = spatial.settings.create();
 			settings.size = {width: 80, height: 80};
 			settings.entrances = [{i:0,j:0},{i:0,j:52}];
 			settings.exits = [{i:79,j:79}];
@@ -38,7 +38,7 @@ describe('@below test kit',function(){
 			settings.walls = [{i:6,j:5},{i:7,j:5},{i:8,j:5}];
 			settings.costFunction = function(value,coord){ return 1*Math.pow(2,coord.j)};
 
-			var grid = below.generate(settings);
+			var grid = spatial.generate(settings);
 
 			expect(Grid.has(grid,0,0)).to.be.true;
 			expect(Grid.has(grid,79,79)).to.be.true;
@@ -90,7 +90,7 @@ describe('@below test kit',function(){
 		})
 
 		it('should query entrances / exits correctly', function(){
-			var settings = below.settings.create();
+			var settings = spatial.settings.create();
 			settings.size = {width: 80, height: 80};
 			settings.entrances = [{i:0,j:0},{i:0,j:52}];
 			settings.exits = [{i:79,j:79}];
@@ -99,10 +99,10 @@ describe('@below test kit',function(){
 			settings.walls = [{i:6,j:5},{i:7,j:5},{i:8,j:5}];
 			settings.costFunction = function(value,coord){ return 1*Math.pow(2,coord.j)};
 
-			var grid = below.generate(settings);
+			var grid = spatial.generate(settings);
 
-			below.entrances(grid).should.deep.equal(settings.entrances);
-			below.exits(grid).should.deep.equal(settings.exits);
+			spatial.entrances(grid).should.deep.equal(settings.entrances);
+			spatial.exits(grid).should.deep.equal(settings.exits);
 		})
 
 	})
@@ -112,7 +112,7 @@ describe('@below test kit',function(){
 		var grid = [];
 
 		before(function(done){
-			var settings = below.settings.create();
+			var settings = spatial.settings.create();
 			settings.size = {width: 12, height: 12};
 			settings.entrances = [{i:5,j:0},{i:3,j:0}];
 			settings.exits = [];
@@ -121,12 +121,12 @@ describe('@below test kit',function(){
 			settings.walls = [{i:6,j:5},{i:7,j:5},{i:8,j:5}];
 			settings.costFunction = function(v,coord){return parseInt(coord.i)+2*parseInt(coord.j)};
 
-			grid = below.generate(settings);
+			grid = spatial.generate(settings);
 			done();
 		})
 
 		it('should map 2d cost matrix', function(){
-			var cost = below.array2d.map(grid,function(cell){ return cell['cost'] });
+			var cost = spatial.array2d.map(grid,function(cell){ return cell['cost'] });
 			console.log(cost);
 
 			cost.should.have.length(12);
@@ -137,7 +137,7 @@ describe('@below test kit',function(){
 		})
 
 		it('should map 2d item matrix', function(){
-			var item = below.array2d.map(grid,function(cell){ return cell['items'].join(',')});
+			var item = spatial.array2d.map(grid,function(cell){ return cell['items'].join(',')});
 			console.log(item);
 
 			item.should.have.length(12);
@@ -149,8 +149,8 @@ describe('@below test kit',function(){
 		})
 
 		it('should pluck 2d matrix', function(){
-			var costFromMap = below.array2d.map(grid,function(cell){ return cell['cost'] });
-			var costFromPluck = below.array2d.pluck(grid,'cost');
+			var costFromMap = spatial.array2d.map(grid,function(cell){ return cell['cost'] });
+			var costFromPluck = spatial.array2d.pluck(grid,'cost');
 
 			for (var i in costFromMap){
 				costFromMap[i].should.deep.equal(costFromPluck[i]);
@@ -159,7 +159,7 @@ describe('@below test kit',function(){
 
 		it('should shift a grid with positive direction', function(){
 			var grid = Grid.create(25,25,{'content':42});
-			var grid_after = below.array2d.offset(grid,25,25);
+			var grid_after = spatial.array2d.offset(grid,25,25);
 
 			for (var i=0; i<25; i++)
 				for (var j=0; j<25; j++){
@@ -170,8 +170,8 @@ describe('@below test kit',function(){
 
 		it('should shift a grid with negative direction', function(done){
 			var grid = Grid.create(512,512,{'content':42});
-			var grid_after = below.array2d.offset(grid,512,512);
-			var grid_after2 = below.array2d.offset(grid_after,-24,-24);
+			var grid_after = spatial.array2d.offset(grid,512,512);
+			var grid_after2 = spatial.array2d.offset(grid_after,-24,-24);
 
 			expect(Grid.has(grid_after2,999,999)).to.be.true;
 			expect(Grid.has(grid_after2,1000,1000)).to.be.false;
@@ -183,8 +183,8 @@ describe('@below test kit',function(){
 		it('should merge two grids', function(){
 			var grid1 = Grid.create(80,80,'A');
 			var grid2 = Grid.create(75,75,'B');
-			grid3 = below.array2d.offset(grid2, 80, 80);
-			grid4 = below.array2d.merge(grid1, grid3);
+			grid3 = spatial.array2d.offset(grid2, 80, 80);
+			grid4 = spatial.array2d.merge(grid1, grid3);
 
 			expect(Grid.has(grid4,0,0)).to.be.true;
 			expect(Grid.has(grid4,154,154)).to.be.true;
@@ -200,7 +200,7 @@ describe('@below test kit',function(){
 			var grid2 = Grid.create(35,35,{});
 			Grid.eachOf(grid2).setTo({foo:'bar'});
 
-			var grid3 = below.array2d.merge(grid1, grid2);
+			var grid3 = spatial.array2d.merge(grid1, grid2);
 
 			expect(Grid.has(grid3,49,49)).to.be.true;
 			expect(Grid.cell(0,0).of(grid3)).to.deep.equal({foo:'bar'});
@@ -213,7 +213,7 @@ describe('@below test kit',function(){
 
 	describe('routing tests', function(){
 		var grid = []
-		var settings = below.settings.create();
+		var settings = spatial.settings.create();
 		settings.size = {width: 42, height: 42};
 		settings.entrances = [{i:31,j:0}];
 		settings.exits = [{i:12,j:41}];
@@ -239,19 +239,19 @@ describe('@below test kit',function(){
 		settings.costFunction = function(value,coord){ return 1 };
 
 		before(function(done){
-			grid = below.generate(settings);
+			grid = spatial.generate(settings);
 			done();
 		})
 
 		it('should generate a short path between two points (no cost fn)', function(){
 			var verbose = false;
-			var route = below.generateSimpleRoute(
+			var route = spatial.generateSimpleRoute(
 				grid,
 				{i:7,j:10},
 				{i:15,j:20},
 				verbose
 			); // This will utilize Lee's route finder
-			below.illustrate(grid,route);
+			spatial.illustrate(grid,route);
 			route.should.have.length.above(2);
 			expect(_.first(route)).to.deep.equal({i:7,j:10});
 			expect(_.last(route)).to.deep.equal({i:15,j:20});
@@ -259,13 +259,13 @@ describe('@below test kit',function(){
 
 		it('should generate a short path between two points (with cost fn)', function(){
 			var verbose = false;
-			var route = below.generateBestRoute(
+			var route = spatial.generateBestRoute(
 				grid,
 				{i:7,j:10},
 				{i:15,j:20},
 				verbose
 			); // This will utilize Lee's route finder
-			below.illustrate(grid,route);
+			spatial.illustrate(grid,route);
 			route.should.have.length.above(2);
 			expect(_.first(route)).to.deep.equal({i:7,j:10});
 			expect(_.last(route)).to.deep.equal({i:15,j:20});
@@ -273,13 +273,13 @@ describe('@below test kit',function(){
 
 		it('should generate a simple route from @entrance --> @exit (no cost function)', function(){
 			var verbose = false;
-			var route = below.generateSimpleRoute(
+			var route = spatial.generateSimpleRoute(
 				grid,
 				settings.entrances[0],
 				settings.exits[0],
 				verbose
 			); // This will utilize Lee's route finder
-			below.illustrate(grid,route);
+			spatial.illustrate(grid,route);
 			route.should.have.length.above(2);
 			expect(_.first(route)).to.deep.equal(settings.entrances[0]);
 			expect(_.last(route)).to.deep.equal(settings.exits[0]);
@@ -289,8 +289,8 @@ describe('@below test kit',function(){
 		it ('should find a route from @entrance --> @exit',function(done){
 			// A*
 			var verbose = false;
-			var route = below.generateBestRoute(grid, settings.entrances[0], settings.exits[0], verbose);
-			below.illustrate(grid,route);
+			var route = spatial.generateBestRoute(grid, settings.entrances[0], settings.exits[0], verbose);
+			spatial.illustrate(grid,route);
 			route.should.have.length.above(2);
 			expect(_.first(route)).to.deep.equal(settings.entrances[0]);
 			expect(_.last(route)).to.deep.equal(settings.exits[0]);
@@ -303,26 +303,26 @@ describe('@below test kit',function(){
 
 		it('should check if exit is accessible', function(){
 			var g = [];
-			var settings = below.settings.create();
+			var settings = spatial.settings.create();
 			settings.size = {width: 10, height: 10};
 			settings.entrances = [{i:5,j:0}];
 			settings.exits = [{i:3,j:9},{i:8,j:9}];
 			settings.walls = [];
 
-			g = below.generate(settings);
-			expect(below.isExitAccessible(g,{i:5,j:0})).to.be.true;
+			g = spatial.generate(settings);
+			expect(spatial.isExitAccessible(g,{i:5,j:0})).to.be.true;
 
 			for (var a=0; a<10; a++){
 				settings.walls.push({i:a, j:5});
 			}
 
-			g = below.generate(settings);
-			expect(below.isExitAccessible(g,{i:5,j:0})).to.be.false;
+			g = spatial.generate(settings);
+			expect(spatial.isExitAccessible(g,{i:5,j:0})).to.be.false;
 		})
 
 		it('should check if a certain cell is accessible', function(){
 			var g = [];
-			var settings = below.settings.create();
+			var settings = spatial.settings.create();
 			settings.size = {width: 10, height: 10};
 			settings.entrances = [{i:5,j:0}];
 			settings.exits = [{i:3,j:9},{i:8,j:9}];
@@ -332,13 +332,13 @@ describe('@below test kit',function(){
 				else return (coord.j+1)
 			}
 
-			g = below.generate(settings);
+			g = spatial.generate(settings);
 
-			below.illustrateCost(g);
+			spatial.illustrateCost(g);
 
-			expect(below.isAccessible(g,{i:0,j:0},{i:0,j:9})).to.be.true;
-			expect(below.isAccessible(g,{i:0,j:0},{i:1,j:9})).to.be.false;
-			expect(below.isAccessible(g,{i:0,j:9},{i:5,j:9})).to.be.false;
+			expect(spatial.isAccessible(g,{i:0,j:0},{i:0,j:9})).to.be.true;
+			expect(spatial.isAccessible(g,{i:0,j:0},{i:1,j:9})).to.be.false;
+			expect(spatial.isAccessible(g,{i:0,j:9},{i:5,j:9})).to.be.false;
 		})
 
 	})
@@ -347,7 +347,7 @@ describe('@below test kit',function(){
 
 		var grid = [];
 		it('should save the grid to the database', function(done){
-			var settings = below.settings.create();
+			var settings = spatial.settings.create();
 			settings.size = {width: 16, height: 16};
 			settings.entrances = [{i:0,j:0},{i:15,j:15}];
 			settings.exits = [{i:0,j:15}];
@@ -358,10 +358,10 @@ describe('@below test kit',function(){
 				return {i:parseInt(i),j:10}
 			});
 			
-			grid = below.generate(settings);
+			grid = spatial.generate(settings);
 			var saveAll = function(){return true};
 
-			below.mongo.init(null,'gridsample','grid').then(below.mongo.save(grid,saveAll)).done(function(n){
+			spatial.mongo.init(null,'gridsample','grid').then(spatial.mongo.save(grid,saveAll)).done(function(n){
 				console.log(n.toString().yellow + ' records saved!'.yellow);
 				done();
 			});
@@ -369,7 +369,7 @@ describe('@below test kit',function(){
 
 		it('should load the grid from the database', function(done){
 			var constraint = {i0:0, j0:0, iN:16, jN:16};
-			below.mongo.init(null,'gridsample','grid').then(below.mongo.load(constraint)).done(function(grid2){
+			spatial.mongo.init(null,'gridsample','grid').then(spatial.mongo.load(constraint)).done(function(grid2){
 				// Validate
 				for (var u of Object.keys(grid))
 					for (var v of Object.keys(grid[u])){
@@ -389,7 +389,7 @@ describe('@below test kit',function(){
 			var g = Grid.create(20,20,{});
 			Grid.eachOf(g).where(isInSavingRegion).setTo({'foo':'baz'});
 
-			below.mongo.init(null,'gridsample','grid').then(below.mongo.save(g,isInSavingRegion)).done(function(n){
+			spatial.mongo.init(null,'gridsample','grid').then(spatial.mongo.save(g,isInSavingRegion)).done(function(n){
 				expect(n).to.equal(100);
 				done();
 			})
