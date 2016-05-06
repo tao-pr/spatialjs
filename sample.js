@@ -20,12 +20,22 @@ while (wi<23 && wj<23){
 }
 
 var grid = spatial.generate(setting);
+var route;
+
+// Lee's route
+// console.log('--------------'.green)
+// console.log('Lee\'s route'.green)
+// console.log('--------------'.green)
+// route = spatial.generateSimpleRoute(grid,{i:12,j:0},{i:23,j:23});
+// spatial.illustrate(grid, route);
+// console.log('Total cost spent for this route: ' + spatial.sumCostOfRoute(grid,route).toFixed(0).toString() );
+
 
 // A* route
 console.log('--------------'.green)
 console.log('A* route'.green)
 console.log('--------------'.green)
-var route = spatial.generateBestRoute(grid,{i:12,j:0},{i:23,j:23});
+route = spatial.generateBestRoute(grid,{i:12,j:0},{i:23,j:23});
 spatial.illustrate(grid, route);
 console.log('Total cost spent for this route: ' + spatial.sumCostOfRoute(grid,route).toFixed(0).toString() );
 
