@@ -80,7 +80,7 @@ describe('@spatial test kit',function(){
 
 			// {WALLS} Positive test
 			settings.walls.forEach(function (wall){
-				expect(Grid.cell(wall.i,wall.j).of(grid)['cost']).to.equal(0xFFFF);
+				expect(Grid.cell(wall.i,wall.j).of(grid)['cost']).to.equal(Infinity);
 			})
 
 			// {COST} tests
@@ -131,7 +131,7 @@ describe('@spatial test kit',function(){
 
 			cost.should.have.length(12);
 			cost[0].should.have.length(12);
-			expect(cost[6][5]).to.equal(0xFFFF);
+			expect(cost[6][5]).to.equal(Infinity);
 			expect(cost[0][0]).to.equal(0);
 			expect(cost[2][2]).to.equal(6);
 		})
@@ -243,7 +243,7 @@ describe('@spatial test kit',function(){
 			done();
 		})
 
-		it('should generate a short path between two points (no cost fn)', function(){
+		it.skip('should generate a short path between two points (no cost fn)', function(){
 			var verbose = false;
 			var route = spatial.generateSimpleRoute(
 				grid,
@@ -271,7 +271,7 @@ describe('@spatial test kit',function(){
 			expect(_.last(route)).to.deep.equal({i:15,j:20});
 		})
 
-		it('should generate a simple route from @entrance --> @exit (no cost function)', function(){
+		it.skip('should generate a simple route from @entrance --> @exit (no cost function)', function(){
 			var verbose = false;
 			var route = spatial.generateSimpleRoute(
 				grid,
@@ -296,6 +296,8 @@ describe('@spatial test kit',function(){
 			expect(_.last(route)).to.deep.equal(settings.exits[0]);
 			done();
 		})
+
+		// TAOTODO: Add dijkstra test
 
 	})
 
@@ -343,58 +345,4 @@ describe('@spatial test kit',function(){
 
 	})
 
-	describe('mongodb interface tests', function(){
-
-		var grid = [];
-		it('should save the grid to the database', function(done){
-			var settings = spatial.settings.create();
-			settings.size = {width: 16, height: 16};
-			settings.entrances = [{i:0,j:0},{i:15,j:15}];
-			settings.exits = [{i:0,j:15}];
-			settings.items = [{i:12,j:12,item:'apple'},{i:10,j:14,item:'pencil'}];
-			settings.obstacles = [{i:1,j:0,obstacle:255}];
-			settings.costFunction = Math.abs;
-			settings.walls = Array.apply(null, new Array(15)).map(function(a,i){
-				return {i:parseInt(i),j:10}
-			});
-			
-			grid = spatial.generate(settings);
-			var saveAll = function(){return true};
-
-			spatial.mongo.init(null,'gridsample','grid').then(spatial.mongo.save(grid,saveAll)).done(function(n){
-				console.log(n.toString().yellow + ' records saved!'.yellow);
-				done();
-			});
-		})
-
-		it('should load the grid from the database', function(done){
-			var constraint = {i0:0, j0:0, iN:16, jN:16};
-			spatial.mongo.init(null,'gridsample','grid').then(spatial.mongo.load(constraint)).done(function(grid2){
-				// Validate
-				for (var u of Object.keys(grid))
-					for (var v of Object.keys(grid[u])){
-						console.log(u+','+v+' > ' +JSON.stringify(grid[u][v]));
-						expect(grid2[u][v]).to.deep.equal(grid[u][v]);
-					}
-				done();
-			});
-		})
-
-		// NOTE: This test cannot be run after the previous mongo tests for some reason
-		// If you want to test this, skip the mongo tests above and run.
-		it.skip('should partially save the database and partially load the portion back', function(done){
-			var isInSavingRegion = function(v,coord){
-				return parseInt(coord.i)<5
-			}
-			var g = Grid.create(20,20,{});
-			Grid.eachOf(g).where(isInSavingRegion).setTo({'foo':'baz'});
-
-			spatial.mongo.init(null,'gridsample','grid').then(spatial.mongo.save(g,isInSavingRegion)).done(function(n){
-				expect(n).to.equal(100);
-				done();
-			})
-
-		})
-
-	})
 })

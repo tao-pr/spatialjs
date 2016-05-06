@@ -479,7 +479,7 @@ Grid.routeOf = Grid.route = Grid.routing = function(grid){
 				 				else 
 				 					console.log('route .... ' + JSON.stringify(route[route.length-1]));
 				 			}
-				 			return moveTowardsStart(next, pos, route);
+				 			return moveTowardsStart.call(null,next, pos, route);
 				 		}
 				 	}
 
@@ -491,9 +491,9 @@ Grid.routeOf = Grid.route = Grid.routing = function(grid){
 				 	wave[magnitude] = _.filter(wave[magnitude], function(c){
 				 		return c.i!=pos.i && c.j!=pos.j
 				 	});
-				 	if (!(0xFFFF in wave))
-				 		wave[0xFFFF] = [];
-				 	wave[0xFFFF].push({i:pos.i,j:pos.j});
+				 	if (!(Infinity in wave))
+				 		wave[Infinity] = [];
+				 	wave[Infinity].push({i:pos.i,j:pos.j});
 
 				 	// Recess by one block
 				 	route = route.slice(0,route.length-1);
