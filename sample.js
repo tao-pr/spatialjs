@@ -33,7 +33,7 @@ console.log('Total cost spent for this route: ' + spatial.sumCostOfRoute(grid,ro
 console.log('--------------'.green)
 console.log('Dijkstra route'.green)
 console.log('--------------'.green)
-route = spatial.generateDijkstraRoute(grid,{i:12,j:0},{i:23,j:23},true);
+route = spatial.generateDijkstraRoute(grid,{i:12,j:0},{i:23,j:23});
 spatial.illustrate(grid, route);
 console.log('Total cost spent for this route: ' + spatial.sumCostOfRoute(grid,route).toFixed(0).toString() );
 
