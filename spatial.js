@@ -73,7 +73,7 @@ spatial.generate = function(settings){
 	settings.items.forEach(applyListToCell('item'));
 	settings.obstacles.forEach(applyListToCell('obstacle'));
 	settings.walls.forEach(function(wall){
-		Grid.cell(wall.i, wall.j).applyProperty(grid)('cost',function(){return 0xFFFF})
+		Grid.cell(wall.i, wall.j).applyProperty(grid)('cost',function(){return Infinity})
 	});
 
 	return grid;
