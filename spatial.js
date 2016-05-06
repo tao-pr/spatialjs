@@ -378,29 +378,16 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 		console.log(l);
 	}
 
-	var piece = startCoord;
+	var piece = endCoord;
 	var route = [];
 	while (piece){
 		route.push(piece);
 		var _i = piece.i;
 		var _j = piece.j;
-		piece = null;
-		for (var i in prev)
-			for (var j in prev[i])
-				if (prev[i][j] && prev[i][j].i==_i && prev[i][j].j==_j)
-					piece = {i:i, j:j}
+		piece = prev[_i][_j];
 	}
-	return route;
 
-	// var route = [endCoord];
-	// while (true){
-	// 	var tail = _.last(route);
-	// 	if (tail.i == startCoord.i && tail.j == startCoord.j)
-	// 		break;
-	// 	var next = Grid.cell(tail.i,tail.j).of(prev);
-	// 	route.push(next);
-	// }
-	// return route.reverse();
+	return route.reverse();
 }
 
 
