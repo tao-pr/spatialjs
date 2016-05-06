@@ -276,8 +276,9 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 
 	var HeapQ = require('fastpriorityqueue');
 
-	var dist = Grid.duplicateStructure(grid,Infinity);
-	var prev = Grid.duplicateStructure(grid,undefined);
+	var dist   = Grid.duplicateStructure(grid,Infinity);
+	var prev   = Grid.duplicateStructure(grid,undefined);
+	var visits = Grid.duplicateStructure(grid,0);
 
 	// Create vertex set 
 	var q = new HeapQ((a,b) => a.dist - b.dist)
@@ -290,62 +291,64 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 
 		// Initialise the distance from the source
 		// to each of the cell on the grid
-		var dist = Infinity;
 		if (i==startCoord.i && j==startCoord.j){
-			dist = 0;
+			Grid.cell(i,j).set(dist)(0);
+			q.add({i:parseInt(i), j:parseInt(j), dist: 0});
 		}
-
-		q.add({i:parseInt(i), j:parseInt(j), dist: dist})
+		else{
+			q.add({i:parseInt(i), j:parseInt(j), dist: Infinity})
+		}
 	})
+
 
 	// Main loop of path construction
 	while (!q.isEmpty()){
 		// At the 1st turn, the start coord is supposed to be chosen
 		var u = q.poll();
 
-		if (verbose){
-			console.log('Next u = '.cyan, u);
-			console.log('Q size = '.cyan, q.size);
-		}
+		// Should not visit more than a certain level
+		var nVisits = Grid.cell(u.i,u.j).of(visits);
+		
+		// Count up the number of visits
+		Grid.cell(u.i,u.j).set(visits)(nVisits+1);
 
 		// Examine all neighbors of @u
 		var eachNeighbors = Grid.eachSibling(grid)(u.i,u.j);
 		var dist_u        = Grid.cell(u.i,u.j).of(dist);
+		u.cost            = Grid.cell(u.i,u.j).of(grid).cost;
+
+		if (verbose){
+			console.log('u = '.cyan, u, 'Q size = '.cyan, q.size);
+		}
 
 		eachNeighbors((v,_i,_j) => {
 
-			if (verbose)
-				console.log('Expanding: '.yellow + `(${_i},${_j})`)
+			var stepCost   = v.cost;
+			var actualDist = isNaN(stepCost) ? Infinity : stepCost + dist_u;
 
-			var actualDist = dist_u < Infinity ? v.cost + dist_u : v.cost;
 			if (actualDist < Grid.cell(_i,_j).of(dist)){
 				// Apply the actual examined distance cost of @v
 				Grid.cell(_i,_j).set(dist)(actualDist);
 				// Predecessor of @v now set to @u
 				Grid.cell(_i,_j).set(prev)({i:u.i, j:u.j});
 
-				if (verbose){
-					console.log('New distance.. '.green,
-						`(${_i},${_j}) = ${actualDist}`)
-				}
-
-				// Reapply the priority of @v in the heap
+				// Apply a new distance to the cell
 				var tmpList = [];
-				while (q.size>0 && q.peek().i!=u.i && q.peek().j!=u.j)
-					tmpList.push(q.poll())
-				
-				// The item addressed?
+				while (q.size>0 && q.peek().i!=_i && q.peek().j!=_j)
+					tmpList.push(q.poll());
+
 				if (q.size>0){
-					// Update its new (actual) distance
-					var elem  = q.poll();
-					elem.dist = actualDist;
-					q.add(elem);
+					q.poll();
 				}
 
-				// Push the polled item back in to the queue
-				while (tmpList.length>0){
+				q.add({i:_i, j:_j, dist:actualDist})
+
+				// Re-add the removed items
+				while (tmpList.length>0)
 					q.add(tmpList.pop())
-				}
+
+				if (verbose)
+					console.log(`  (${_i},${_j}) cost=${v.cost} :--> ${actualDist.toString().cyan}`);					
 			}
 		})
 	}
@@ -356,17 +359,48 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 		console.log('Constructing route'.cyan);
 
 	// TAODEBUG:
-	console.log(prev);
+	for (let j in prev){
+		var l = ''
+		for (let i in prev[j]){
+			var c;
+			if (prev[i][j]) c = '[∂]';
+			else c = '[ ]';
 
-	var route = [endCoord];
-	while (true){
-		var tail = _.last(route);
-		if (tail.i == startCoord.i && tail.j == startCoord.j)
-			break;
-		var next = Grid.cell(tail.i,tail.j).of(prev);
-		route.push(next);
+			if (i==startCoord.i && j==startCoord.j)
+				c = c.green;
+			else if (i==endCoord.i && j==endCoord.j)
+				c = c.cyan;
+			else 
+				c = c.white;
+
+			l += c;
+		}
+		console.log(l);
 	}
-	return route.reverse();
+
+	var piece = startCoord;
+	var route = [];
+	while (piece){
+		route.push(piece);
+		var _i = piece.i;
+		var _j = piece.j;
+		piece = null;
+		for (var i in prev)
+			for (var j in prev[i])
+				if (prev[i][j] && prev[i][j].i==_i && prev[i][j].j==_j)
+					piece = {i:i, j:j}
+	}
+	return route;
+
+	// var route = [endCoord];
+	// while (true){
+	// 	var tail = _.last(route);
+	// 	if (tail.i == startCoord.i && tail.j == startCoord.j)
+	// 		break;
+	// 	var next = Grid.cell(tail.i,tail.j).of(prev);
+	// 	route.push(next);
+	// }
+	// return route.reverse();
 }
 
 

@@ -177,7 +177,11 @@ Grid.siblings = function(grid){
 			[i-1, j],
 			[i+1, j],
 			[i, j-1],
-			[i, j+1]
+			[i, j+1],
+			[i-1, j-1],
+			[i-1, j+1],
+			[i+1, j-1],
+			[i+1, j+1]
 		];
 
 		sib = _.filter(sib, function(ij){ return Grid.has(grid,ij[0],ij[1]) });

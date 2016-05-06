@@ -5,7 +5,7 @@ setting.size = {width:24, height:24};
 setting.costFunction = function(v,c){
 	var i = c.i-11;
 	var j = 11-c.j;
-	return i*j % Math.abs(i+j)
+	return i*i + j*j
 }
 
 setting.walls = []
