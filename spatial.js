@@ -358,26 +358,6 @@ spatial.generateDijkstraRoute = function(grid,startCoord,endCoord,verbose){
 	if (verbose)
 		console.log('Constructing route'.cyan);
 
-	// TAODEBUG:
-	for (let j in prev){
-		var l = ''
-		for (let i in prev[j]){
-			var c;
-			if (prev[i][j]) c = '[∂]';
-			else c = '[ ]';
-
-			if (i==startCoord.i && j==startCoord.j)
-				c = c.green;
-			else if (i==endCoord.i && j==endCoord.j)
-				c = c.cyan;
-			else 
-				c = c.white;
-
-			l += c;
-		}
-		console.log(l);
-	}
-
 	var piece = endCoord;
 	var route = [];
 	while (piece){
