@@ -6,6 +6,10 @@ A bite-sized tool for 2D spatial grid processing.
 
 ---
 
+> Development Status: POC
+
+---
+
 ## Include SpatialJS to your project
 
 ```javascript
