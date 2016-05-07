@@ -136,6 +136,17 @@ you out on how to get started quickly.
 
 ---
 
+# Testing
+
+The project includes a test suite out-of-the-box. 
+To run the suite, execute:
+
+```bash
+$ mocha
+```
+
+---
+
 # Licence
 
 ![WTFPL](https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/WTFPL_logo.svg/280px-WTFPL_logo.svg.png)
