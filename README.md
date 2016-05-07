@@ -1,5 +1,8 @@
 # SpatialJS
 
+[![Build Status](https://travis-ci.org/starcolon/spatialjs.svg?branch=master)](https://travis-ci.org/starcolon/spatialjs)
+[![Coverage Status](https://coveralls.io/repos/github/starcolon/spatialjs/badge.svg?branch=master)](https://coveralls.io/github/starcolon/spatialjs?branch=master)
+
 >Resurrected from : http://github.com/starcolon/spatial.git
 
 A bite-sized tool for 2D spatial grid processing.
@@ -7,6 +10,16 @@ A bite-sized tool for 2D spatial grid processing.
 ---
 
 > Development Status: POC
+
+---
+
+## Setting up
+
+Collect all prerequisites and install:
+
+```bash
+$ npm install
+```
 
 ---
 
@@ -142,7 +155,7 @@ The project includes a test suite out-of-the-box.
 To run the suite, execute:
 
 ```bash
-$ mocha
+$ npm test
 ```
 
 ---
