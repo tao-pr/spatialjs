@@ -14,14 +14,17 @@
   "scripts": {
     "test": "mocha"
   },
-  "dependencies": {
-    "body-parser": ">= 1.10.0",
+  "devDependencies":{
+    "mocha": "*",
     "chai": "^2.3.0",
     "chai-things": "^0.2.0",
+    "coveralls": "^2.11.9"
+  },
+  "dependencies": {
+    "body-parser": ">= 1.10.0",
     "colors": "*",
     "express": "*",
     "fastpriorityqueue": "0.0.16",
-    "mocha": "*",
     "mongodb": "^1.4.28",
     "mongoskin": "^1.4.13",
     "promise": "*",
